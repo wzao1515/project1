@@ -106,7 +106,7 @@ def index():
 
   if not session.get('logged_in'):
     return render_template('login.html')
-  else
+  else:
   """
   request is a special object that Flask provides to access web request information:
 
