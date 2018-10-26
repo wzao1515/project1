@@ -103,6 +103,10 @@ def teardown_request(exception):
 #
 @app.route('/')
 def index():
+
+  if not session.get('logged_in'):
+    return render_template('login.html')
+  else
   """
   request is a special object that Flask provides to access web request information:
 
@@ -114,17 +118,17 @@ def index():
   """
 
   # DEBUG: this is debugging code to see what request looks like
-  print request.args
+    print request.args
 
 
   #
   # example of a database query
   #
-  cursor = g.conn.execute("SELECT name FROM test")
-  names = []
-  for result in cursor:
-    names.append(result['name'])  # can also be accessed using result[0]
-  cursor.close()
+    cursor = g.conn.execute("SELECT name FROM test")
+    names = []
+    for result in cursor:
+      names.append(result['name'])  # can also be accessed using result[0]
+    cursor.close()
 
   #
   # Flask uses Jinja templates, which is an extension to HTML where you can
@@ -152,14 +156,14 @@ def index():
   #     <div>{{n}}</div>
   #     {% endfor %}
   #
-  context = dict(data = names)
+    context = dict(data = names)
 
 
   #
   # render_template looks in the templates/ folder for files.
   # for example, the below file reads template/index.html
   #
-  return render_template("index.html", **context)
+    return render_template("index.html", **context)
 
 #
 # This is an example of a different path.  You can see it at
@@ -184,10 +188,13 @@ def add():
   return redirect('/')
 
 
-@app.route('/login')
+@app.route('/login', methods=['POST'])
 def login():
-    abort(401)
-    this_is_never_executed()
+    if request.form['password'] == 'password' and request.form['username'] == 'admin':
+        session['logged_in'] = True
+    else:
+        flash('wrong password!')
+    return index()
 
 
 if __name__ == "__main__":
@@ -216,4 +223,5 @@ if __name__ == "__main__":
     app.run(host=HOST, port=PORT, debug=debug, threaded=threaded)
 
 
+  secret_key = os.usrandom(12)
   run()
