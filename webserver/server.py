@@ -107,20 +107,8 @@ def index():
   if not session.get('logged_in'):
     return render_template('login.html')
   else:
-  """
-  request is a special object that Flask provides to access web request information:
-
-  request.method:   "GET" or "POST"
-  request.form:     if the browser submitted a form, this contains the data in the form
-  request.args:     dictionary of URL arguments e.g., {a:1, b:2} for http://localhost?a=1&b=2
-
-  See its API: http://flask.pocoo.org/docs/0.10/api/#incoming-request-data
-  """
-
   # DEBUG: this is debugging code to see what request looks like
     print request.args
-
-
   #
   # example of a database query
   #
