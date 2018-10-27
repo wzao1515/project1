@@ -11,6 +11,9 @@ from user import User
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 app = Flask(__name__, template_folder=tmpl_dir)
 
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'index'
 
 
 # XXX: The Database URI should be in the format of: 
@@ -225,7 +228,7 @@ def valid_user(user):
 
 @app.route('/login', methods=['POST'])
 def login():
-  user = User(request.form['username'], requestform['password'])
+  user = User(request.form['username'], request.form['password'])
   if valid_user(user):
     login_user(user)
     return redirect(url_for('main'))
@@ -257,7 +260,7 @@ def valid_pwd(hashed, input_pwd):
 
 
 def register_user(user):
-  cursor = g.conn.execute("INSERT INTO suser (uid, u_name, location, email, phone, password) VALUES (%d, %s,%s, %s, %s, %s)", (os.urandom(12), user.username, user.location, user.email user.phone, encrypt_pwd(user.password)))
+  cursor = g.conn.execute("INSERT INTO suser (uid, u_name, location, email, phone, password) VALUES (%d, %s,%s, %s, %s, %s)", (os.urandom(12), user.username, user.location, user.email, user.phone, encrypt_pwd(user.password)))
 
   cursor.close()
 
