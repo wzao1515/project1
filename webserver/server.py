@@ -1,8 +1,12 @@
 #!/usr/bin/env python2.7
-import os
+import os, base64
+from hashlib import sha256
+from hmac import HMAC
 from sqlalchemy import *
 from sqlalchemy.pool import NullPool
 from flask import Flask, request, render_template, g, redirect, Response, session
+from flask_login import LoginManager, login_required, login_user, logout_user, current_user
+from user import User
 
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 app = Flask(__name__, template_folder=tmpl_dir)
@@ -159,14 +163,109 @@ def add():
   g.conn.execute(text(cmd), name1 = name, name2 = name);
   return redirect('/')
 
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+  if request.method == 'GET':
+    return render_template('register.html')
+
+  error = None
+
+  if request.method == 'POST':
+    try:
+      new_user = User(request.form['username'],
+                      request.form['password'],
+		      request.form['location'],
+		      request.form['phone'],
+                      request.form['email'])
+
+      except ValueError:
+	error = "Username or Password is empty"
+
+      if (not is_registered(new_user)):
+        register_user(new_user)
+        login_user(new_user)
+        return redirect(url_for('main'))
+      else:
+        error = "existed username."
+
+  return render_template('register.html', error=error)
+
+def register_user(user):
+  cursor = g.conn.execute("INSERT INTO suser (u_name, password, email, phone, location) VALUES (%s, %s, %s, %s, %s)", (user.username, user.password, user.email, user.phone, user.location))
+
+  cursor.close()
+
+def is_registered_user(user):
+  cursor = g.conn.execute("SELECT * FROM suser WHERE u_name=%s", (user.username))
+  data = cursor.fetchone()
+  cursor.close()
+
+  if data:
+    return True
+  else:
+    return False
+
+@login_manager.user_loader
+def load_user(username):
+  cursor = g.conn.execute("SELECT * FROM suser WHERE u_name=%s", username)
+  data = cursor.fetchone()
+  cursor.close()
+
+  if data is None:
+    return None
+
+  return User(data[1], data[2], data[3], data[4], data[5], data[0])
+
+def valid_user(user):
+  cursor = g.conn.execute("SELECT * FROM suser WHERE u_name=%s", user.username)
+  data = cursor.fetchone()
+  cursor.close()
+
+  return valid_pwd(user.password, data[2])
 
 @app.route('/login', methods=['POST'])
 def login():
-    if request.form['password'] == 'password' and request.form['username'] == 'admin':
-        session['logged_in'] = True
-    else:
-        flash('wrong password!')
-    return index()
+  user = User(request.form['username'], requestform['password'])
+  if valid_user(user):
+    login_user(user)
+    return redirect(url_for('main'))
+  
+  return render_template('login.html', error='Invalid username or password.')
+
+
+def encrypt_pwd(pwd, salt=None):
+  if salt is None:
+    salt = os.random(8)
+  
+  assert 8==len(salt)
+  assert isinstance(salt, str)
+
+  if isinstance(pwd, unicode):
+    pwd = pwd.encode('UTF-8')
+  
+  assert isinstance(pwd, str)
+  
+  result = pwd
+  for i in xrange(10):
+    result = HMAC(result, salt, sha256).digest()
+
+  return salt + result
+
+
+def valid_pwd(hashed, input_pwd):
+  return hashed == encrypt_pwd(input_pwd, salt = hashed[:8])
+
+
+def register_user(user):
+  cursor = g.conn.execute("INSERT INTO suser (uid, u_name, location, email, phone, password) VALUES (%d, %s,%s, %s, %s, %s)", (os.urandom(12), user.username, user.location, user.email user.phone, encrypt_pwd(user.password)))
+
+  cursor.close()
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect('/')
 
 
 if __name__ == "__main__":
