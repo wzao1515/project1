@@ -198,7 +198,7 @@ def register_user(user):
 
   cursor.close()
 
-def is_registered_user(user):
+def is_registered(user):
   cursor = g.conn.execute("SELECT * FROM suser WHERE u_name=%s", (user.username))
   data = cursor.fetchone()
   cursor.close()
@@ -238,7 +238,7 @@ def login():
 
 def encrypt_pwd(pwd, salt=None):
   if salt is None:
-    salt = os.random(8)
+    salt = os.urandom(8)
   
   assert 8==len(salt)
   assert isinstance(salt, str)
