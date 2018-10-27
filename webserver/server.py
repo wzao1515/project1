@@ -178,7 +178,7 @@ def register():
 		      request.form['phone'],
                       request.form['email'])
 
-      except ValueError:
+      except ValueError as e:
 	error = "Username or Password is empty"
 
       if (not is_registered(new_user)):
