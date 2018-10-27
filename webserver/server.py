@@ -178,15 +178,15 @@ def register():
 		      request.form['phone'],
                       request.form['email'])
 
-      except ValueError as e:
-	error = "Username or Password is empty"
+    except ValueError as e:
+      error = "Username or Password is empty"
 
-      if (not is_registered(new_user)):
-        register_user(new_user)
-        login_user(new_user)
-        return redirect(url_for('main'))
-      else:
-        error = "existed username."
+    if (not is_registered(new_user)):
+      register_user(new_user)
+      login_user(new_user)
+      return redirect(url_for('main'))
+    else:
+      error = "existed username."
 
   return render_template('register.html', error=error)
 
