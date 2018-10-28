@@ -222,8 +222,9 @@ def register():
 
   return render_template('register.html', error=error)
 
+
 def register_user(user):
-  cursor = g.conn.execute("INSERT INTO suser (u_name, password, email, phone, location) VALUES (%s, %s, %s, %s, %s)", (user.username, user.password, user.email, user.phone, user.location))
+  cursor = g.conn.execute("INSERT INTO suser (uid, u_name, location, email, phone, password) VALUES (%s, %s,%s, %s, %s, %s)", ('11', user.username, user.location, user.email, user.phone, encrypt_pwd(user.password)))
 
   cursor.close()
 
@@ -285,10 +286,6 @@ def valid_pwd(hashed, input_pwd):
   return hashed == encrypt_pwd(input_pwd, salt = hashed[:8])
 
 
-def register_user(user):
-  cursor = g.conn.execute("INSERT INTO suser (uid, u_name, location, email, phone, password) VALUES (%s, %s,%s, %s, %s, %s)", ('11', user.username, user.location, user.email, user.phone, encrypt_pwd(user.password)))
-
-  cursor.close()
 
 @app.route('/logout')
 @login_required
