@@ -95,7 +95,7 @@ def teardown_request(exception):
 @app.route('/')
 def index():
 
-  if current_user.is_sign_in:
+  if current_user.is_authenticated:
     return redirect(url_for('snc'))
   # DEBUG: this is debugging code to see what request looks like
     print request.args
@@ -140,7 +140,7 @@ def index():
   # render_template looks in the templates/ folder for files.
   # for example, the below file reads template/index.html
   #
-  return render_template("index.html")
+  return render_template("login.html")
 
 
 @app.route('/snc', methods = ['GET', 'POST'])
@@ -253,7 +253,7 @@ def valid_user(user):
   data = cursor.fetchone()
   cursor.close()
 
-  return valid_pwd(user.password, data[2])
+  return valid_pwd(int(user.password), data[2])
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -272,10 +272,7 @@ def encrypt_pwd(pwd, salt=None):
   assert 8==len(salt)
   assert isinstance(salt, str)
 
-  if isinstance(pwd, unicode):
-    pwd = pwd.encode('UTF-8')
-  
-  assert isinstance(pwd, str)
+  pwd =  pwd.encode('UTF-8')
   
   result = pwd
   for i in xrange(10):
@@ -289,7 +286,7 @@ def valid_pwd(hashed, input_pwd):
 
 
 def register_user(user):
-  cursor = g.conn.execute("INSERT INTO suser (uid, u_name, location, email, phone, password) VALUES (%d, %s,%s, %s, %s, %s)", (os.urandom(12), user.username, user.location, user.email, user.phone, encrypt_pwd(user.password)))
+  cursor = g.conn.execute("INSERT INTO suser (uid, u_name, location, email, phone, password) VALUES (%s, %s,%s, %s, %s, %s)", ('11', user.username, user.location, user.email, user.phone, encrypt_pwd(user.password)))
 
   cursor.close()
 
