@@ -16,7 +16,7 @@ class User():
     self.uid = uid
     self.location = location
 
-  def is_authenticated(self):
+  def is_sign_in(self):
     return True
 
   def is_active(self):

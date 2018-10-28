@@ -95,20 +95,18 @@ def teardown_request(exception):
 @app.route('/')
 def index():
 
-  if not session.get('logged_in'):
-    return render_template('login.html')
-  else:
+  if current_user.is_sign_in:
+    return redirect(url_for('snc'))
   # DEBUG: this is debugging code to see what request looks like
     print request.args
   #
   # example of a database query
   #
-    cursor = g.conn.execute("SELECT name FROM test")
-    names = []
-    for result in cursor:
-      names.append(result['name'])  # can also be accessed using result[0]
-    cursor.close()
-
+    #cursor = g.conn.execute("SELECT name FROM test")
+    #names = []
+    #for result in cursor:
+     # names.append(result['name'])  # can also be accessed using result[0]
+    #cursor.close()
   #
   # Flask uses Jinja templates, which is an extension to HTML where you can
   # pass data to a template and dynamically generate HTML based on the data
@@ -135,27 +133,58 @@ def index():
   #     <div>{{n}}</div>
   #     {% endfor %}
   #
-    context = dict(data = names)
-
+    #context = dict(data = names)
+    
 
   #
   # render_template looks in the templates/ folder for files.
   # for example, the below file reads template/index.html
   #
-    return render_template("index.html", **context)
+  return render_template("index.html")
 
-#
-# This is an example of a different path.  You can see it at
-# 
-#     localhost:8111/another
-#
-# notice that the functio name is another() rather than index()
-# the functions for each app.route needs to have different names
-#
-@app.route('/another')
-def another():
-  return render_template("anotherfile.html")
 
+@app.route('/snc', methods = ['GET', 'POST'])
+@login_required
+def snc():
+
+  snacks = []
+  if bool(request.form):
+    Name = request.form['sname'] if request.form['sname'] else None
+    Type = request.form['type'] if request.form['type'] else None
+    Manu = request.form['manu'] if request.form['manu'] else None
+
+    cursor = g.conn.execute("SELECT * FROM snack WHERE (%s is null OR sname ~ \'%s*\') AND (%s is null OR type = %s) AND (%s is null or manufacturer ~ \'%s\')", Name, Name, Type, Type, Manu, Manu)
+    snacks = cursor.fetchall()
+    cursor.close()  
+
+  else:
+    cursor = g.conn.execute("SELECT * FROM snack")
+    snacks = cursor.fetchall()
+    cursor.close()
+
+# Comments for all
+  comments = []
+
+  cursor = g.conn.execute("SELECT S.bid, R.grades, C.description, to_char(C.p_date, 'Month DD, YYYY'), U.u_name FROM snack S, rate R, comment C, suser U WHERE S.bid = R.bid AND R.bid = C.bid and U.uid = C.uid ORDER BY R.review_date DESC")
+  comments = cursor.fetchall()
+  cursor.close()
+
+# Query Average grades for every snack
+  grades = []
+
+  cursor = g.conn.execute("SELECT S.bid, ROUND(AVG(R.rate),2) FROM snack S, rate R WHERE S.bid = R.bid GROUP BY S.bid")
+  grades = cursor.fetchall()
+  cursor.close()
+
+# Query this user's comments
+  user_comments = []
+
+  cursor = g.conn.execute("SELECT DISTINCT S.bid, R.grades, C.description, to_char(C.p_date, 'Month DD, YYYY') FROM snack S, rate R WHERE S.bid = R.bid AND C.uid=%s AND R.uid=%s", current_user.uid, current_user.uid)
+  user_comments = cursor.fetchall()
+  cursor.close()
+
+  context = dict(snacks=snacks, comments=comments, grades=grades, user_comments=user_comments)
+  return render_template("snc.html", **context)
 
 # Example of adding new data to the database
 @app.route('/add', methods=['POST'])

@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %} Snackchat {% endblock %}
+{% block body %}
+
+<h2>Snacks</h2>
+
+<form method="POST" action="/snc" class="col s12">
+  <div class="row review-form">
+    <div class="input-field col s12 hide">
+      <input placeholder="True" id="search" name="search" type="text" class="validate">
+      <label>Search?</label>
+    </div>
+    <div class="input-field col s4">
+      <input placeholder="Name" id="search-sname" name="sname" type="text" class="validate">
+      <label>Search name</label>
+    </div>
+    <div class="input-field col s4">
+      <input placeholder="Type" id="search-type" name="type" type="text" class="validate">
+      <label>Search type</label>
+    </div>
+    <div class="input-field col s4">
+      <input placeholder="Manufacturer" id="search-manu" name="manu" type="text" class="validate">
+      <label>Search manufacturer</label>
+    </div>
+    <button class="btn waves-effect waves-light red lighten-2 btn-small" type="submit" name="search">Search Now!</button>
+  </div>
+</form>
+
+<div>
+  {% for sname, type, manufacturer in snacks %}
+  <div class="card">
+    <div class="card-content">
+      <!-- Model trigger for writing review -->
+      <a class="waves-effect waves-light btn-small modal-trigger write-review-trigger" href="#write-review-{{mid}}">Write Comment</a>
+      <!-- Community Rating -->
+      <p class="rating">Community Rating:
+      {% for movie_rid, avg_rating in movie_ratings %}
+        {% if movie_rid == mid %}
+        {{ avg_rating }}
+        {% endif %}
+      {% endfor %}
+      </p>
+      <!-- Model: Post comment -->
+      <div id="write-review-{{mid}}" class="modal">
+        <div class="modal-content">
+          <h4>Post Comment for: {{ name }}</h4>
+          <form method="POST" action="/post_comment" class="col s12">
+            <div class="row review-form">
+              <!-- Review: rid (hidden) -->
+              <div class="input-field col s12 hide">
+                <input value="{{ mid }}" id="rid-{{mid}}" name="rid" type="text" class="validate">
+                <label for="rid-{{mid}}">rid</label>
+              </div>
+              <!-- Review: rating -->
+              {% set vars = {'rate': 0, 'lastdate': None} %}
+              {% for sid, rating, desc, p_date in user_comments %}
+                {% if sid == bid %}
+                  {% if vars.update({'rate': rate, 'lastdate': mDate}) %}{% endif %}
+                {% endif %}
+              {% endfor %}
+              {% if vars.lastdate %}<p>Last comment: {{ vars.lastdate }}{% endif %}
+              <div class="input-field col s12">
+                <select name="rating">
+                  <option value="" disabled selected>Rate</option>
+                  <option value="1" {% if vars.rate == 1 %}selected="selected"{% endif %}>1</option>
+                  <option value="2" {% if vars.rate == 2 %}selected="selected"{% endif %}>2</option>
+                  <option value="3" {% if vars.rate == 3 %}selected="selected"{% endif %}>3</option>
+                  <option value="4" {% if vars.rate == 4 %}selected="selected"{% endif %}>4</option>
+                  <option value="5" {% if vars.rate == 5 %}selected="selected"{% endif %}>5</option>
+                </select>
+                <label>Rate</label>
+              </div>
+              <!-- Review: text -->
+              <div class="input-field col s12">
+                {% set vars = {'textPlaceholder': False} %}
+                {% for sid, rating, p_date, des in user_comments %}
+                  {% if sid == bid %}
+                    {% if vars.update({'textPlaceholder': True, 'text': mText}) %}{% endif %}
+                  {% endif %}
+                {% endfor %}
+
+                <textarea placeholder="{% if vars.textPlaceholder %}{{ vars.text }}{% endif %}" id="textarea-{{mid}}" name="text" class="materialize-textarea"></textarea>
+                <label for="textarea-{{mid}}">Review</label>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Cancel</a>
+              <button class="btn waves-effect waves-light" type="submit" name="post_comment">Submit</button>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div id="review-{{mid}}">
+        <h6>Reviews</h6>
+        {% for sid, rating, des, c_date, comment_username in comments %}
+          {% if sid == bid %}
+          <div class="card-panel deep-purple">
+            <p class="white-text">By <b>{{ comment_username }}</b></p>
+            <span class="white-text">Grades: {{ rating }} | Date: {{ c_date }}</span>
+            <hr />
+            <p class="white-text">{{ des }}</p>
+          </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
+
