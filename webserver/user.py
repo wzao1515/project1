@@ -1,13 +1,6 @@
 class User():
   def __init__(self , username, password, location=None, phone=None, email=None, uid=None):
-    if username == "":
-      raise ValueError("Username cannot be empty!")
-
-    if password == "":
-      raise ValueError("Password cannot be empty!")
     
-    if phone == "":
-      raise ValueError("Phone cannot be empty!")
 
     self.username = username
     self.password = password
@@ -16,7 +9,7 @@ class User():
     self.uid = uid
     self.location = location
 
-  def is_sign_in(self):
+  def is_authenticated(self):
     return True
 
   def is_active(self):

@@ -25,26 +25,26 @@
     <button class="btn waves-effect waves-light red lighten-2 btn-small" type="submit" name="search">Search Now!</button>
   </div>
 </form>
-
 <div>
-  {% for sname, type, manufacturer in snacks %}
+	{% for bid, s_name, size, manufacturer, type, cal, fat, carb, prot in snacks %}  
   <div class="card">
     <div class="card-content">
-      <!-- Model trigger for writing review -->
-      <a class="waves-effect waves-light btn-small modal-trigger write-review-trigger" href="#write-review-{{mid}}">Write Comment</a>
+			{{s_name}}
+      <!-- Modal trigger for writing review -->
+      <a class="waves-effect waves-light btn-small modal-trigger write-review-trigger" href="#write-review-{{mid}}">post a comment</a>
       <!-- Community Rating -->
-      <p class="rating">Community Rating:
-      {% for movie_rid, avg_rating in movie_ratings %}
-        {% if movie_rid == mid %}
-        {{ avg_rating }}
+      <p class="rating">Grade:
+      {% for cbid, grade in grades %}
+        {% if bid == cbid %}
+        {{ grade }}
         {% endif %}
       {% endfor %}
       </p>
-      <!-- Model: Post comment -->
+      <!-- Model: Write Review -->
       <div id="write-review-{{mid}}" class="modal">
         <div class="modal-content">
-          <h4>Post Comment for: {{ name }}</h4>
-          <form method="POST" action="/post_comment" class="col s12">
+          <h4>Write a Review for: {{ name }} ({{ year }})</h4>
+          <form method="POST" action="/write_review" class="col s12">
             <div class="row review-form">
               <!-- Review: rid (hidden) -->
               <div class="input-field col s12 hide">
@@ -53,59 +53,46 @@
               </div>
               <!-- Review: rating -->
               {% set vars = {'rate': 0, 'lastdate': None} %}
-              {% for sid, rating, desc, p_date in user_comments %}
-                {% if sid == bid %}
-                  {% if vars.update({'rate': rate, 'lastdate': mDate}) %}{% endif %}
+              {% for ubid, ugrade, udes, udate in user_comments %}
+                {% if ubid == bid %}
+                  {% if vars.update({'rate': ugrade, 'lastdate': udate}) %}{% endif %}
                 {% endif %}
               {% endfor %}
               {% if vars.lastdate %}<p>Last comment: {{ vars.lastdate }}{% endif %}
               <div class="input-field col s12">
                 <select name="rating">
-                  <option value="" disabled selected>Rate</option>
+                  <option value="" disabled selected>Choose your rating</option>
                   <option value="1" {% if vars.rate == 1 %}selected="selected"{% endif %}>1</option>
                   <option value="2" {% if vars.rate == 2 %}selected="selected"{% endif %}>2</option>
                   <option value="3" {% if vars.rate == 3 %}selected="selected"{% endif %}>3</option>
                   <option value="4" {% if vars.rate == 4 %}selected="selected"{% endif %}>4</option>
                   <option value="5" {% if vars.rate == 5 %}selected="selected"{% endif %}>5</option>
                 </select>
-                <label>Rate</label>
+                <label>Rating</label>
               </div>
               <!-- Review: text -->
               <div class="input-field col s12">
                 {% set vars = {'textPlaceholder': False} %}
-                {% for sid, rating, p_date, des in user_comments %}
-                  {% if sid == bid %}
+                {% for ubid, ugrade, udes, udate in user_comments %}
+                  {% if ubid == bid %}
                     {% if vars.update({'textPlaceholder': True, 'text': mText}) %}{% endif %}
                   {% endif %}
                 {% endfor %}
 
                 <textarea placeholder="{% if vars.textPlaceholder %}{{ vars.text }}{% endif %}" id="textarea-{{mid}}" name="text" class="materialize-textarea"></textarea>
-                <label for="textarea-{{mid}}">Review</label>
+                <label for="textarea-{{mid}}">Post your comment!</label>
               </div>
             </div>
             <div class="modal-footer">
               <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Cancel</a>
-              <button class="btn waves-effect waves-light" type="submit" name="post_comment">Submit</button>
+              <button class="btn waves-effect waves-light" type="submit" name="write_review">Submit comment</button>
             </div>
           </form>
         </div>
       </div>
-      <div id="review-{{mid}}">
-        <h6>Reviews</h6>
-        {% for sid, rating, des, c_date, comment_username in comments %}
-          {% if sid == bid %}
-          <div class="card-panel deep-purple">
-            <p class="white-text">By <b>{{ comment_username }}</b></p>
-            <span class="white-text">Grades: {{ rating }} | Date: {{ c_date }}</span>
-            <hr />
-            <p class="white-text">{{ des }}</p>
-          </div>
-          {% endif %}
-        {% endfor %}
-      </div>
     </div>
   </div>
   {% endfor %}
-</div>
+</div>  
 {% endblock %}
 

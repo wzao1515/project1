@@ -5,7 +5,7 @@ from hashlib import sha256
 from hmac import HMAC
 from sqlalchemy import *
 from sqlalchemy.pool import NullPool
-from flask import Flask, request, render_template, g, redirect, Response, session, url_for
+from flask import Flask, request, render_template, g, redirect, Response, session, url_for, flash
 from flask_login import LoginManager, login_required, login_user, logout_user, current_user
 from user import User
 
@@ -150,11 +150,32 @@ def snc():
 
   snacks = []
   if bool(request.form):
-    Name = request.form['sname'] if request.form['sname'] else None
-    Type = request.form['type'] if request.form['type'] else None
-    Manu = request.form['manu'] if request.form['manu'] else None
+    Name = request.form['sname'] if request.form['sname'] else ''
+    Type = request.form['type'] if request.form['type'] else ''
+    Manu = request.form['manu'] if request.form['manu'] else ''
 
-    cursor = g.conn.execute("SELECT * FROM snack WHERE (%s is null OR sname ~ \'%s*\') AND (%s is null OR type = %s) AND (%s is null or manufacturer ~ \'%s\')", Name, Name, Type, Type, Manu, Manu)
+    if Name == '':
+      if Type == '':
+        if Manu == '':
+          cursor = g.conn.execute("SELECT * FROM snack")
+        else:
+          cursor = g.conn.execute("SELECT * FROM snack WHERE manufacturer LIKE %s", Manu)
+      else:
+        if Manu == '':
+          cursor = g.conn.execute("SELECT * FROM snack WHERE type=%s", Type)
+	else:
+	  cursor = g.conn.execute("SELECT * FROM snack WHERE type=%s AND manufacturer LIKE %s", Type, Manu)
+    else:
+      if Type == '':
+        if Manu == '':
+          cursor = g.conn.execute("SELECT * FROM snack WHERE sname LIKE %s", Name)
+        else:
+          cursor = g.conn.execute("SELECT * FROM snack WHERE manufacturer LIKE %s AND sname LIKE %s", Manu, Name)
+      else:
+        if Manu == '':
+          cursor = g.conn.execute("SELECT * FROM snack WHERE type=%s AND sname LIKE %s", Type, Name)
+	else:
+	  cursor = g.conn.execute("SELECT * FROM snack WHERE type=%s AND manufacturer LIKE %s AND sname LIKE %s", Type, Manu, Name) 
     snacks = cursor.fetchall()
     cursor.close()  
 
@@ -166,21 +187,21 @@ def snc():
 # Comments for all
   comments = []
 
-  cursor = g.conn.execute("SELECT S.bid, R.grades, C.description, to_char(C.p_date, 'Month DD, YYYY'), U.u_name FROM snack S, rate R, comment C, suser U WHERE S.bid = R.bid AND R.bid = C.bid and U.uid = C.uid ORDER BY R.review_date DESC")
+  cursor = g.conn.execute("SELECT S.bid, R.grades, C.description, to_char(C.p_date, 'Month DD, YYYY'), U.u_name FROM snack S, rate R, comment C, suser U WHERE S.bid = R.bid AND R.bid = C.bid and U.uid = C.uid ORDER BY C.p_date DESC")
   comments = cursor.fetchall()
   cursor.close()
 
 # Query Average grades for every snack
   grades = []
 
-  cursor = g.conn.execute("SELECT S.bid, ROUND(AVG(R.rate),2) FROM snack S, rate R WHERE S.bid = R.bid GROUP BY S.bid")
+  cursor = g.conn.execute("SELECT S.bid, ROUND(AVG(R.grades),2) FROM snack S, rate R WHERE S.bid = R.bid GROUP BY S.bid")
   grades = cursor.fetchall()
   cursor.close()
 
 # Query this user's comments
   user_comments = []
 
-  cursor = g.conn.execute("SELECT DISTINCT S.bid, R.grades, C.description, to_char(C.p_date, 'Month DD, YYYY') FROM snack S, rate R WHERE S.bid = R.bid AND C.uid=%s AND R.uid=%s", current_user.uid, current_user.uid)
+  cursor = g.conn.execute("SELECT DISTINCT S.bid, R.grades, C.description, to_char(C.p_date, 'Month DD, YYYY') FROM comment C, snack S, rate R WHERE S.bid = R.bid AND C.uid=%s AND R.uid=%s", current_user.uid, current_user.uid)
   user_comments = cursor.fetchall()
   cursor.close()
 
@@ -249,12 +270,21 @@ def valid_user(user):
   if data is None:
     return False
 
-  logging.warning(data)
-  return valid_pwd(str(user.password), str(data[3]))
+  return valid_pwd(data[4], str(user.password))
 
-@app.route('/login', methods=['POST'])
+@app.route('/login', methods=['POST', 'GET'])
 def login():
+  if request.method == 'GET':
+    return render_template('login.html')
   user = User(request.form['username'], request.form['password'])
+  if not user.username:
+    flash("Please enter your name")
+    return render_template('login.html')
+
+  if not user.password:
+    flash("Please enter your password")
+    return render_template('login.html')
+
   if valid_user(user):
     login_user(user)
     return redirect(url_for('snc'))
@@ -262,26 +292,12 @@ def login():
   return render_template('login.html', error='Invalid username or password.')
 
 
-def encrypt_pwd(pwd, salt=None):
-  if salt is None:
-    salt = os.urandom(8)
-  
-  if len(salt) != 8:
-    return False
-  assert isinstance(salt, str)
+def encrypt_pwd(pwd, move=None):
 
-  pwd =  pwd.encode('UTF-8')
-  
-  result = pwd
-  for i in xrange(10):
-    result = HMAC(result, salt, sha256).digest()
-
-
-  return (salt + result).encode('hex')
+  return str(pwd)
 
 def valid_pwd(hashed, input_pwd):
-  return hashed.encode('hex') == encrypt_pwd(input_pwd, salt = hashed[:8])
-
+  return hashed==input_pwd
 
 
 @app.route('/logout')
