@@ -250,7 +250,7 @@ def valid_user(user):
     return False
 
   logging.warning(data)
-  return valid_pwd(str(user.password), str(data[5]))
+  return valid_pwd(str(user.password), str(data[3]))
 
 @app.route('/login', methods=['POST'])
 def login():
