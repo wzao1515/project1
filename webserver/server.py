@@ -216,7 +216,7 @@ def register():
     if (not is_registered(new_user)):
       register_user(new_user)
       login_user(new_user)
-      return redirect(url_for('main'))
+      return redirect(url_for('snc'))
     else:
       error = "existed username."
 
