@@ -280,7 +280,7 @@ def encrypt_pwd(pwd, salt=None):
   return (salt + result).encode('hex')
 
 def valid_pwd(hashed, input_pwd):
-  return hashed == encrypt_pwd(input_pwd, salt = hashed[:8])
+  return hashed.encode('hex') == encrypt_pwd(input_pwd, salt = hashed[:8])
 
 
 
