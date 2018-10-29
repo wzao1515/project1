@@ -208,7 +208,7 @@ def register():
     if (not is_registered(new_user)):
       register_user(new_user)
       login_user(new_user)
-      return render_template('snc.html')
+      return redirect(url_for('snc'))
     else:
       error = "existed username."
 
@@ -231,29 +231,31 @@ def is_registered(user):
     return False
 
 @login_manager.user_loader
-def load_user(username):
-  cursor = g.conn.execute("SELECT * FROM suser WHERE u_name=%s", username)
+def load_user(u_name):
+  cursor = g.conn.execute("SELECT * FROM suser WHERE u_name=%s", u_name)
   data = cursor.fetchone()
   cursor.close()
 
   if data is None:
     return None
 
-  return User(data[1], data[2], data[3], data[4], data[5], data[0])
+  return User(data[1], data[5], data[2], data[4], data[3], data[0])
 
 def valid_user(user):
-  cursor = g.conn.execute("SELECT password FROM suser WHERE u_name=%s", user.username)
+  cursor = g.conn.execute("SELECT * FROM suser WHERE u_name=%s", user.username)
   data = cursor.fetchone()
   cursor.close()
+  if data is None:
+    return False
 
-  return valid_pwd(str(user.password), str(data[0]))
+  return valid_pwd(str(user.password), str(data[5]))
 
 @app.route('/login', methods=['POST'])
 def login():
   user = User(request.form['username'], request.form['password'])
   if valid_user(user):
     login_user(user)
-    return render_template('snc.html')
+    return redirect(url_for('snc'))
   
   return render_template('login.html', error='Invalid username or password.')
 
