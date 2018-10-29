@@ -242,11 +242,11 @@ def load_user(username):
   return User(data[1], data[2], data[3], data[4], data[5], data[0])
 
 def valid_user(user):
-  cursor = g.conn.execute("SELECT * FROM suser WHERE u_name=%s", user.username)
+  cursor = g.conn.execute("SELECT password FROM suser WHERE u_name=%s", user.username)
   data = cursor.fetchone()
   cursor.close()
 
-  return valid_pwd(str(user.password), str(data[2]))
+  return valid_pwd(str(user.password), str(data[0]))
 
 @app.route('/login', methods=['POST'])
 def login():
