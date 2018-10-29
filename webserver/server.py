@@ -1,4 +1,5 @@
 #!/usr/bin/env python2.7
+import logging
 import os, base64
 from hashlib import sha256
 from hmac import HMAC
@@ -248,6 +249,7 @@ def valid_user(user):
   if data is None:
     return False
 
+  logging.warning(data)
   return valid_pwd(str(user.password), str(data[5]))
 
 @app.route('/login', methods=['POST'])
