@@ -186,14 +186,6 @@ def snc():
   context = dict(snacks=snacks, comments=comments, grades=grades, user_comments=user_comments)
   return render_template("snc.html", **context)
 
-# Example of adding new data to the database
-@app.route('/add', methods=['POST'])
-def add():
-  name = request.form['name']
-  print name
-  cmd = 'INSERT INTO test(name) VALUES (:name1), (:name2)';
-  g.conn.execute(text(cmd), name1 = name, name2 = name);
-  return redirect('/')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -216,7 +208,7 @@ def register():
     if (not is_registered(new_user)):
       register_user(new_user)
       login_user(new_user)
-      return redirect(url_for('snc'))
+      return render_template('snc.html')
     else:
       error = "existed username."
 
@@ -261,7 +253,7 @@ def login():
   user = User(request.form['username'], request.form['password'])
   if valid_user(user):
     login_user(user)
-    return redirect(url_for('snc'))
+    return render_template('snc.html')
   
   return render_template('login.html', error='Invalid username or password.')
 
