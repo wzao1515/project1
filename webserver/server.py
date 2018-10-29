@@ -279,8 +279,8 @@ def encrypt_pwd(pwd, salt=None):
   for i in xrange(10):
     result = HMAC(result, salt, sha256).digest()
 
-  return salt + result
 
+  return (salt + result).encode('hex')
 
 def valid_pwd(hashed, input_pwd):
   return hashed == encrypt_pwd(input_pwd, salt = hashed[:8])
