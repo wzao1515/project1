@@ -264,7 +264,8 @@ def encrypt_pwd(pwd, salt=None):
   if salt is None:
     salt = os.urandom(8)
   
-  assert 8==len(salt)
+  if len(salt) != 8:
+    return False
   assert isinstance(salt, str)
 
   pwd =  pwd.encode('UTF-8')
