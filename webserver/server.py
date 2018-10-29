@@ -254,7 +254,7 @@ def valid_user(user):
   data = cursor.fetchone()
   cursor.close()
 
-  return valid_pwd(int(user.password), data[2])
+  return valid_pwd(user.password, data[2])
 
 @app.route('/login', methods=['POST'])
 def login():
