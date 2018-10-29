@@ -4,7 +4,7 @@ from hashlib import sha256
 from hmac import HMAC
 from sqlalchemy import *
 from sqlalchemy.pool import NullPool
-from flask import Flask, request, render_template, g, redirect, Response, session
+from flask import Flask, request, render_template, g, redirect, Response, session, url_for
 from flask_login import LoginManager, login_required, login_user, logout_user, current_user
 from user import User
 
