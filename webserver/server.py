@@ -261,7 +261,7 @@ def login():
   user = User(request.form['username'], request.form['password'])
   if valid_user(user):
     login_user(user)
-    return redirect(url_for('main'))
+    return redirect(url_for('snc'))
   
   return render_template('login.html', error='Invalid username or password.')
 
