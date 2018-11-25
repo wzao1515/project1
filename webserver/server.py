@@ -216,7 +216,8 @@ def snc():
 		else:
 			if Type == '':
 				if Manu == '':
-					cursor = g.conn.execute("SELECT * FROM snack WHERE sname LIKE %s", Name)
+					logging.warning("just name")
+					cursor = g.conn.execute("SELECT * FROM snack WHERE sname LIKE %s", Name.encode("utf-8"))
 				else:
 					cursor = g.conn.execute("SELECT * FROM snack WHERE manufacturer LIKE %s AND sname LIKE %s", Manu, Name)
 			else:
@@ -243,6 +244,7 @@ def snc():
 	FROM hot_snack HS, snack S
 WHERE HS.bid=S.bid''')
 	snacks = cursor.fetchall()
+	print snacks
 	cursor.close()  
 
 # Comments for all
