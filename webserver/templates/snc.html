@@ -29,8 +29,8 @@
 	{% for bid, s_name, size, manufacturer, type, cal, fat, carb, prot in snacks %}  
   <div class="card">
     <div class="card-content">
-			{{s_name}}
-			{{manufacturer}}
+			<a class="waves-effect waves-light modal-trigger see-review-trigger" href="#see-review-{{bid}}">{{s_name}}</a>
+			<p>{{manufacturer}}</p>
       <!-- Modal trigger for writing review -->
       <a class="waves-effect waves-light btn-small modal-trigger write-review-trigger" href="#write-review-{{bid}}">post a comment</a>
       <!-- Community Rating -->
@@ -41,6 +41,43 @@
         {% endif %}
       {% endfor %}
       </p>
+			<!--Model: See Review -->
+			<div id="see-review-{{bid}}" class="modal">
+				<div class="modal-content">
+					<h3>{{s_name}}</h3>
+						<h4>Nutritions:</h4>
+						<table style="width:40%">
+  						<tr>
+    						<th>Type</th>
+    						<th>Per seving</th> 
+ 							</tr>
+  						<tr>
+    						<td>Calories</td>
+    						<td>{{cal}}</td>
+  						</tr>
+  						<tr>
+    						<td>Fat</td>
+    						<td>{{fat}}</td>
+  						</tr>
+  						<tr>
+    						<td>Carbon</td>
+    						<td>{{carb}}</td>
+  						</tr>
+							<tr>
+								<td>Protein</td>
+								<td>{{prot}}</td>
+						</table>
+					<h4>What do customers say:</h4>
+					{% for cbid, user_name, grade, comm, dat in comments %}
+						{% if bid == cbid %}
+						<p style="font-size:120%;">{{user_name}}<p>
+						<p style="font-style:oblique;">{{comm}}</p>
+						<p>Grade: {{grade}}</p>
+						</p>{{dat}}</p>
+						{% endif %}
+					{% endfor %}
+				</div>
+			</div>
       <!-- Model: Write Review -->
       <div id="write-review-{{bid}}" class="modal">
         <div class="modal-content">

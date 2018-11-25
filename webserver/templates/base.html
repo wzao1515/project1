@@ -29,7 +29,7 @@
   <body style="background: #fff;">
 {% endif %}
   <!-- Navigation Menu -->
-  {% if current_user.is_authenticated or request.path == "/register" %}
+  {% if current_user.is_authenticated or request.path == "/register" or request.path == "/login" %}
   <header class="mdl-layout__header mdl-layout__header--transparent">
     <!-- Navigation -->
     <nav>
