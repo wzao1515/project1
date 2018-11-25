@@ -1,7 +1,8 @@
 #!/usr/bin/env python2.7
 import logging
-import os, base64
+import os, base64, random
 from hashlib import sha256
+from datetime import datetime
 from hmac import HMAC
 from sqlalchemy import *
 from sqlalchemy.pool import NullPool
@@ -49,7 +50,6 @@ engine.execute("""CREATE TABLE IF NOT EXISTS test (
   name text
 );""")
 engine.execute("""INSERT INTO test(name) VALUES ('grace hopper'), ('alan turing'), ('ada lovelace');""")
-
 
 
 @app.before_request
@@ -144,69 +144,120 @@ def index():
   return render_template("login.html")
 
 
+@app.route('/post_comment', methods = ['POST'])
+def post_comment():
+	uid = current_user.uid
+	p_date = str(datetime.now().date())
+	logging.warning(request.form['bid'])
+	logging.warning(request.form['text'])
+	res = g.conn.execute("UPDATE rate set grades=%s, bid=%s WHERE uid=%s", request.form['grades'], request.form['bid'], uid)
+	res = g.conn.execute("UPDATE comment set bid=%s, p_date=%s, description=%s WHERE uid = %s", request.form['bid'], p_date, request.form['text'], uid)
+	return redirect('/snc')
+
+
+@app.route('/U_setting', methods = ['POST', 'GET'])
+@login_required
+def U_setting():
+	us = []
+	
+	cursor = g.conn.execute("SELECT uid, u_name, location, email, phone from suser WHERE uid=%s", current_user.uid)
+	us = cursor.fetchall()	
+	cursor.close()
+	logging.warning(us)
+	noteat = []
+	cursor = g.conn.execute("SELECT i_name, uid FROM noteat where uid=%s", current_user.uid)
+	noteat = cursor.fetchall()
+	cursor.close()
+
+	if bool(request.form):
+		cursor = g.conn.execute("SELECT count(*) from noteat where uid=%s", current_user.uid)
+		number = cursor.fetchone()
+		
+		res = g.conn.execute("UPDATE noteat set ")
+	else:	
+		pass
+	context = dict(us=us, noteat=noteat)
+	return render_template('U_setting.html', **context)
+
 @app.route('/snc', methods = ['GET', 'POST'])
 @login_required
 def snc():
 
-  snacks = []
-  if bool(request.form):
-    Name = request.form['sname'] if request.form['sname'] else ''
-    Type = request.form['type'] if request.form['type'] else ''
-    Manu = request.form['manu'] if request.form['manu'] else ''
+	snacks = []
+	if bool(request.form):
+		Name = request.form['sname'] if request.form['sname'] else ''
+		Type = request.form['type'] if request.form['type'] else ''
+		Manu = request.form['manu'] if request.form['manu'] else ''
+		logging.warning(Name)
+		logging.warning(Type)
+		logging.warning(Manu)
 
-    if Name == '':
-      if Type == '':
-        if Manu == '':
-          cursor = g.conn.execute("SELECT * FROM snack")
-        else:
-          cursor = g.conn.execute("SELECT * FROM snack WHERE manufacturer LIKE %s", Manu)
-      else:
-        if Manu == '':
-          cursor = g.conn.execute("SELECT * FROM snack WHERE type=%s", Type)
+		if Name == '':
+			if Type == '':
+				if Manu == '':
+					cursor = g.conn.execute("SELECT * FROM snack")
+				else:
+					cursor = g.conn.execute("SELECT * FROM snack WHERE manufacturer LIKE %s", Manu)
+			else:
+				if Manu == '':
+					cursor = g.conn.execute("SELECT * FROM snack WHERE type=%s", Type)
+				else:
+					cursor = g.conn.execute("SELECT * FROM snack WHERE type=%s AND manufacturer LIKE %s", Type, Manu)
+		else:
+			if Type == '':
+				if Manu == '':
+					cursor = g.conn.execute("SELECT * FROM snack WHERE sname LIKE %s", Name)
+				else:
+					cursor = g.conn.execute("SELECT * FROM snack WHERE manufacturer LIKE %s AND sname LIKE %s", Manu, Name)
+			else:
+				if Manu == '':
+					cursor = g.conn.execute("SELECT * FROM snack WHERE type=%s AND sname LIKE %s", Type, Name)
+				else:
+					cursor = g.conn.execute("SELECT * FROM snack WHERE type=%s AND manufacturer LIKE %s AND sname LIKE %s", Type, Manu, Name) 
 	else:
-	  cursor = g.conn.execute("SELECT * FROM snack WHERE type=%s AND manufacturer LIKE %s", Type, Manu)
-    else:
-      if Type == '':
-        if Manu == '':
-          cursor = g.conn.execute("SELECT * FROM snack WHERE sname LIKE %s", Name)
-        else:
-          cursor = g.conn.execute("SELECT * FROM snack WHERE manufacturer LIKE %s AND sname LIKE %s", Manu, Name)
-      else:
-        if Manu == '':
-          cursor = g.conn.execute("SELECT * FROM snack WHERE type=%s AND sname LIKE %s", Type, Name)
-	else:
-	  cursor = g.conn.execute("SELECT * FROM snack WHERE type=%s AND manufacturer LIKE %s AND sname LIKE %s", Type, Manu, Name) 
-    snacks = cursor.fetchall()
-    cursor.close()  
-
-  else:
-    cursor = g.conn.execute("SELECT * FROM snack")
-    snacks = cursor.fetchall()
-    cursor.close()
+		#if no search, should show the hot goods
+		cursor = g.conn.execute('''	WITH hot_snack(name,type,avg, bid) AS(
+	SELECT DISTINCT S1.sname, S1.type, AVG(R1.grades) as avg, S1.bid
+	FROM snack S1, rate R1
+	WHERE S1.bid=R1.bid
+	GROUP BY S1.bid
+	HAVING AVG(R1.grades) >= ALL(
+			SELECT AVG(R2.grades)
+			FROM snack S2, rate R2
+			WHERE S2.type=S1.type
+			AND S2.bid=R2.bid
+			GROUP BY S2.bid
+		)
+	)
+	SELECT S.*
+	FROM hot_snack HS, snack S
+WHERE HS.bid=S.bid''')
+	snacks = cursor.fetchall()
+	cursor.close()  
 
 # Comments for all
-  comments = []
+	comments = []
 
-  cursor = g.conn.execute("SELECT S.bid, R.grades, C.description, to_char(C.p_date, 'Month DD, YYYY'), U.u_name FROM snack S, rate R, comment C, suser U WHERE S.bid = R.bid AND R.bid = C.bid and U.uid = C.uid ORDER BY C.p_date DESC")
-  comments = cursor.fetchall()
-  cursor.close()
+	cursor = g.conn.execute("SELECT S.bid, R.grades, C.description, to_char(C.p_date, 'Month DD, YYYY'), U.u_name FROM snack S, rate R, comment C, suser U WHERE S.bid = R.bid AND R.bid = C.bid and U.uid = C.uid ORDER BY C.p_date DESC")
+	comments = cursor.fetchall()
+	cursor.close()
 
 # Query Average grades for every snack
-  grades = []
+	grades = []
 
-  cursor = g.conn.execute("SELECT S.bid, ROUND(AVG(R.grades),2) FROM snack S, rate R WHERE S.bid = R.bid GROUP BY S.bid")
-  grades = cursor.fetchall()
-  cursor.close()
+	cursor = g.conn.execute("SELECT S.bid, ROUND(AVG(R.grades),2) FROM snack S, rate R WHERE S.bid = R.bid GROUP BY S.bid")
+	grades = cursor.fetchall()
+	cursor.close()
 
 # Query this user's comments
-  user_comments = []
+	user_comments = []
 
-  cursor = g.conn.execute("SELECT DISTINCT S.bid, R.grades, C.description, to_char(C.p_date, 'Month DD, YYYY') FROM comment C, snack S, rate R WHERE S.bid = R.bid AND C.uid=%s AND R.uid=%s", current_user.uid, current_user.uid)
-  user_comments = cursor.fetchall()
-  cursor.close()
+	cursor = g.conn.execute("SELECT DISTINCT S.bid, R.grades, C.description, to_char(C.p_date, 'Month DD, YYYY') FROM comment C, snack S, rate R WHERE S.bid = R.bid AND C.uid=%s AND R.uid=%s", current_user.uid, current_user.uid)
+	user_comments = cursor.fetchall()
+	cursor.close()
 
-  context = dict(snacks=snacks, comments=comments, grades=grades, user_comments=user_comments)
-  return render_template("snc.html", **context)
+	context = dict(snacks=snacks, comments=comments, grades=grades, user_comments=user_comments)
+	return render_template("snc.html", **context)
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -238,7 +289,7 @@ def register():
 
 
 def register_user(user):
-  cursor = g.conn.execute("INSERT INTO suser (uid, u_name, location, email, phone, password) VALUES (%s, %s,%s, %s, %s, %s)", ('11', user.username, user.location, user.email, user.phone, encrypt_pwd(user.password)))
+  cursor = g.conn.execute("INSERT INTO suser (u_name, location, email, phone, password) VALUES (%s,%s, %s, %s, %s)", (user.username, user.location, user.email, user.phone, encrypt_pwd(user.password)))
 
   cursor.close()
 
