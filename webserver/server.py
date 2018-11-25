@@ -144,7 +144,7 @@ def index():
   return render_template("login.html")
 
 
-@app.route('/post_comment', methods = ['POST'])
+@app.route('/post_comment', methods = ['POST', 'GET'])
 @login_required
 def post_comment():
 	uid = current_user.uid
@@ -153,11 +153,14 @@ def post_comment():
 	logging.warning(request.form['text'])
 	
 	cursor = g.conn.execute("SELECT * from rate where bid=%s AND uid=%s", request.form['bid'], uid)
-	if cursor.fetchall() == []:
+	s = []
+	s = cursor.fetchall()
+	cursor.close()
+	if s == []:
 		res = g.conn.execute("INSERT into rate(uid, grades, bid) values (%s, %s, %s)", uid, request.form['grades'], request.form['bid'])
 		res = g.conn.execute("INSERT into comment(uid, bid, p_date, description) values (%s, %s, %s, %s)", uid, request.form['bid'], p_date, request.form['text'])
 	else:
-		res = g.conn.execute("UPDATE rate set grades=%s, bid=%s WHERE uid=%s", request.form['grades'], request.form['bid'], uid)
+		res = g.conn.execute("UPDATE rate set grades=%s WHERE bid=%s AND uid=%s", request.form['grades'], request.form['bid'], uid)
 		res = g.conn.execute("UPDATE comment set bid=%s, p_date=%s, description=%s WHERE uid = %s", request.form['bid'], p_date, request.form['text'], uid)
 	return redirect('/snc')
 
