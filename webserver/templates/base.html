@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="utf-8">
-  <title>{% block title %}{% endblock %}</title>
+  <title style="color:white;">{% block title %}{% endblock %}</title>
 
   <!-- FONTS -->
   <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
@@ -29,7 +29,7 @@
   <body style="background: #fff;">
 {% endif %}
   <!-- Navigation Menu -->
-  {% if current_user.is_authenticated or request.path == "/register" or request.path == "/login" %}
+  {% if current_user.is_authenticated or request.path == "/register" %}
   <header class="mdl-layout__header mdl-layout__header--transparent">
     <!-- Navigation -->
     <nav>

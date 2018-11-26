@@ -1,18 +1,18 @@
 /* app.scss */
-// Need to compile down to app.css
-//
 // === COLORS ===
-// $GVBLUE: #0097c7cc;
-// $GVBLUE-DARK: #0D546B;
-$GVBLUE-DARK-T: #0D546Bcc;
-$GVBLACK: rgba(0, 0, 0, 0.8);
-$GVWHITE-OFF: #f1f1f1;
-$GVRED: #d32f2f;
-$GVBLUE-BRIGHT: #1a87ab;
-$GVPURPLE: #864cb3db;
-$GVPURPLE-DARK: #5e258adb;
-$GVPURPLE-GRAD: #050015b3;
-$GVPURPLE-BRIGHT: #8336bfdb;
+$SCBLUE-DARK-T: #0D546Bcc;
+$SCBLACK: rgba(0, 0, 0, 0.8);
+$SCWHITE-OFF: #f1f1f1;
+$SCRED: #d32f2f;
+$SCBLUE-BRIGHT: #1a87ab;
+$SCPURPLE: #864cb3db;
+$SCPURPLE-DARK: #5e258adb;
+$SCPURPLE-GRAD: #050015b3;
+$SCPURPLE-BRIGHT: #8336bfdb;
+$SCORANGE: #ff7f50;
+$SCORANGE-DARK: #ff6347;
+$SCBACK: ##72707b;
+$SCRED: rgb(238, 110, 115);
 
 body, html {
   height: 100%;
@@ -22,8 +22,8 @@ body, html {
 body {
   font-family: 'Roboto', Helvetica, sans-serif;
   background: linear-gradient(
-  rgba(255, 0, 0, 0.0),
-  $GVPURPLE-GRAD
+  rgba(100, 0, 0, 0.0),
+  $SCBACK
   ), url('../img/background.jpg') no-repeat fixed center center;
   background-size: cover;
   display: flex;
@@ -40,18 +40,18 @@ body {
   width: 100%;
   height: 100%;
   display: inline-table; // fix collapsing margin
-  background: $GVWHITE-OFF;
+  background: $SCWHITE-OFF;
 }
 
 button, input[type="submit"], .btn {
   font-size: 1.5rem !important;
   color: white;
-  background: $GVPURPLE;
+  background: $SCORANGE;
   box-shadow: none;
-  border-radius: 2px;
+  border-radius: 1.5px;
 
   &:hover {
-    background: $GVPURPLE-DARK;
+    background: $SCORANGE-DARK;
   }
 }
 
@@ -86,7 +86,7 @@ span.talent, span.showing {
 
 p.rating {
   // color: #888888;
-  color: $GVBLUE-BRIGHT;
+  color: $SCBLUE-BRIGHT;
   text-transform: uppercase;
   font-weight: bold;
 }
@@ -94,7 +94,7 @@ p.rating {
 // Navigation
 nav {
   box-shadow: none;
-  background-color: $GVPURPLE-DARK;
+  background-color: $SCRED;
 
   .brand-logo {
     font-family: 'Roboto Slab', Helvetica, sans-serif;
@@ -109,7 +109,7 @@ ul.sidenav {
     }
 
     &:first-child {
-      background: $GVPURPLE-BRIGHT;
+      background: $SCPURPLE-BRIGHT;
       color: white;
       padding: 1rem 0;
     }
@@ -183,12 +183,12 @@ form {
   margin: 2rem auto;
 
   h1,h2,h3,h4,h5,h6,p,label {
-    color: $GVBLACK !important;
+    color: $SCBLACK !important;
   }
 }
 
 .mdl-page {
-  background: $GVWHITE-OFF;
+  background: $SCWHITE-OFF;
   color: #000;
 }
 
@@ -200,7 +200,7 @@ form {
   }
 
   .error {
-    background: $GVRED;
+    background: $SCRED;
     border-radius: 2px;
     padding: 0.5rem 1rem;
   }
@@ -258,14 +258,14 @@ form {
     }
 
     .login {
-      background-color: $GVPURPLE;
+      background-color: $SCORANGE;
       &:hover {
-        background-color: $GVPURPLE-DARK;
+        background-color: $SCORANGE-DARK;
       }
     }
 
     .signin {
-      background-color: $GVBLACK;
+      background-color: $SCBLACK;
       &:hover {
         background-color: black;
       }
@@ -294,7 +294,7 @@ li {
 
 // HIGHLIGHT FOR INTERESTS ON EVENTS PAGE
 span.interest {
-  background: $GVBLUE-BRIGHT;
+  background: $SCBLUE-BRIGHT;
   border-radius: 2px;
   color: white;
   padding: .25rem 1rem;

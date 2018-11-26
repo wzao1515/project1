@@ -1,32 +1,33 @@
 {% extends "base.html" %}
 {% block title%} Settings {% endblock %}
 {% block body %}
-<div class="mdl-modal row z-depth-1">
-	<h2> Settings </h2>
+	<h2 align="left"> Settings </h2>
 
 {% for uid, name, locate, email, phone in us %}
-	<h4>{{name}}<h4>
-{% for iname, id in noteat %}
-<div class=" deep-purple lighten-3 white-text">
-	<table class="highlight reponsive-table">
-		<h4>{{name}}<h4>
-		<thead>
+	<h4>{{name}}</h4>
+	<h5>{{email}}</h5>
+<form action="" class="col s12" method="post">
+	<table class="">
 			<tr>
-				<th>Location</th>
-				<th>Email</th>
-				<th>Phone</th>
+				<td>Location</td>
+				<td>
+					<div class="input-field col s12">
+      			<input type="text" value="{{request.form.locate}}" name="locate" id="locate">
+        		<label for="username">{{locate}}</label>
+      		</div>
+				</td>
 			</tr>
-		</thead>
-
-		<tbody>
 			<tr>
-				<td>{{locate}}</td>
-				<td>{{email}}</td>
-				<td>{{phone}}</td>
+				<td>Phone</td>
+				<td>
+          <div class="input-field col s12">
+            <input type="text" value="{{request.form.phone}}" name="phone" id="phone">
+            <label for="phone">{{phone}}</label>
+          </div>
+				</td>
 			</tr>
-		</tbody>
 	</table>
-</div>
-{% endfor %}
+	<input class="btn waves-effect waves-light" type="submit" value="Save changes">
+</form>
 {% endfor %}
 {% endblock %}

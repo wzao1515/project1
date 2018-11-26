@@ -178,11 +178,26 @@ def U_setting():
 	noteat = cursor.fetchall()
 	cursor.close()
 
+	if request.method == 'GET':
+		context = dict(us=us, noteat=noteat)
+		return render_template('U_setting.html', **context)
 	if bool(request.form):
-		cursor = g.conn.execute("SELECT count(*) from noteat where uid=%s", current_user.uid)
-		number = cursor.fetchone()
-		
-		res = g.conn.execute("UPDATE noteat set ")
+		print "request form::"
+		print request.form
+		print "us::"
+		print us
+		locate = ''
+		phone = ''
+		for i, j in enumerate(us[0]):
+			if i == 2:
+				locate = j
+			if i == 4:
+				phone = j
+		if request.form['locate'] != '':
+			locate = request.form['locate']
+		if request.form['phone'] != '':
+			phone = request.form['phone']
+		cursor = g.conn.execute("UPDATE suser set location=%s, phone=%s where uid=%s", phone, phone, current_user.uid)
 	else:	
 		pass
 	context = dict(us=us, noteat=noteat)
@@ -320,8 +335,8 @@ def load_user(u_name):
 
   if data is None:
     return None
-
-  return User(data[1], data[5], data[2], data[4], data[3], data[0])
+  print (data)
+  return User(data[5], data[4], data[1], data[3], data[2], data[0])
 
 def valid_user(user):
   cursor = g.conn.execute("SELECT * FROM suser WHERE u_name=%s", user.username)

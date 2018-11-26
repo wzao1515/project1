@@ -28,13 +28,13 @@ body > .container {
 button, input[type="submit"], .btn {
   font-size: 1.5rem !important;
   color: white;
-  background: #864cb3db;
+  background: #ff7f50;
   box-shadow: none;
   border-radius: 2px;
 }
 
 button:hover, input[type="submit"]:hover, .btn:hover {
-  background: #5e258adb;
+  background: #ff6347;
 }
 
 a.write-review-trigger {
@@ -70,7 +70,7 @@ p.rating {
 
 nav {
   box-shadow: none;
-  background-color: #00FFFF;
+  background-color: #orange;
 }
 
 nav .brand-logo {
@@ -79,11 +79,12 @@ nav .brand-logo {
 }
 
 ul.sidenav li h1, ul.sidenav li h2, ul.sidenav li h3, ul.sidenav li h4, ul.sidenav li h5, ul.sidenav li h6 {
+	background-color: rgb(238, 110, 115);
   padding: 0 32px;
 }
 
 ul.sidenav li:first-child {
-  background: #8336bfdb;
+  background: rgb(238, 110, 115);
   color: white;
   padding: 1rem 0;
 }
