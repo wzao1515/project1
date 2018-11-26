@@ -64,7 +64,6 @@ def before_request():
   try:
     g.conn = engine.connect()
   except:
-    print "uh oh, problem connecting to database"
     import traceback; traceback.print_exc()
     g.conn = None
 
@@ -207,24 +206,23 @@ def snc():
 				if Manu == '':
 					cursor = g.conn.execute("SELECT * FROM snack")
 				else:
-					cursor = g.conn.execute("SELECT * FROM snack WHERE manufacturer LIKE %s", Manu)
+					cursor = g.conn.execute("SELECT * FROM snack WHERE manufacturer ILIKE %s", Manu+'%')
 			else:
 				if Manu == '':
-					cursor = g.conn.execute("SELECT * FROM snack WHERE type=%s", Type)
+					cursor = g.conn.execute("SELECT * FROM snack WHERE type ILIKE %s", Type+'%')
 				else:
-					cursor = g.conn.execute("SELECT * FROM snack WHERE type=%s AND manufacturer LIKE %s", Type, Manu)
+					cursor = g.conn.execute("SELECT * FROM snack WHERE type ILIKE %s AND manufacturer ILIKE %s", Type+'%', Manu+'%')
 		else:
 			if Type == '':
 				if Manu == '':
-					logging.warning("just name")
-					cursor = g.conn.execute("SELECT * FROM snack WHERE sname LIKE %s", Name.encode("utf-8"))
+					cursor = g.conn.execute("SELECT * FROM snack WHERE sname ILIKE %s", Name+'%')
 				else:
-					cursor = g.conn.execute("SELECT * FROM snack WHERE manufacturer LIKE %s AND sname LIKE %s", Manu, Name)
+					cursor = g.conn.execute("SELECT * FROM snack WHERE manufacturer ILIKE %s AND sname ILIKE %s", Manu+'%', Name+'%')
 			else:
 				if Manu == '':
-					cursor = g.conn.execute("SELECT * FROM snack WHERE type=%s AND sname LIKE %s", Type, Name)
+					cursor = g.conn.execute("SELECT * FROM snack WHERE type ILIKE %s AND sname ILIKE %s", Type+'%', Name+'%')
 				else:
-					cursor = g.conn.execute("SELECT * FROM snack WHERE type=%s AND manufacturer LIKE %s AND sname LIKE %s", Type, Manu, Name) 
+					cursor = g.conn.execute("SELECT * FROM snack WHERE type ILIKE %s AND manufacturer ILIKE %s AND sname ILIKE %s", Type+'%', Manu+'%', Name+'%') 
 	else:
 		#if no search, should show the hot goods
 		cursor = g.conn.execute('''	WITH hot_snack(name,type,avg, bid) AS(
@@ -244,7 +242,6 @@ def snc():
 	FROM hot_snack HS, snack S
 WHERE HS.bid=S.bid''')
 	snacks = cursor.fetchall()
-	print snacks
 	cursor.close()  
 
 # Comments for all
