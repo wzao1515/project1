@@ -286,7 +286,7 @@ WHERE HS.bid=S.bid''')
         prices = cursor.fetchall()
         cursor.close()
 
-	context = dict(snacks=snacks, comments=comments, grades=grades, user_comments=user_comments)
+	context = dict(snacks=snacks, comments=comments, grades=grades, user_comments=user_comments, prices=prices)
 	return render_template("snc.html", **context)
 
 
