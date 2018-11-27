@@ -68,6 +68,32 @@
 								<td>Protein</td>
 								<td>{{prot}}</td>
 						</table>
+					<br />
+					<br />
+					<h4>Sold at:</h4>
+						<table style="width:40%">
+						<tr>
+						<th>Market</th>
+						<th>Price ($)</th>
+						<th>Website</th>
+						<th>Location</th>
+						<th>Open Time</th>
+						</tr>
+						{% for m_name, pbid, price, location, topen, tclose, website in prices %}
+						    {% if bid == pbid %}
+						    <tr>
+						    <td>{{m_name}}</td>
+						    <td>{{price}}</td>
+						    <td>{{website}}</td>
+						    <td>{{location}}</td>
+						    <td>{{topen}} AM - {{tclose}} PM</td>
+						    </tr>
+						    {% endif %}
+						  {% endfor %}
+						  </table>
+					<br />
+					<br />
+					
 					<h4>What do customers say:</h4>
 					{% for cbid, user_name, grade, comm, dat in comments %}
 						{% if bid == cbid %}
