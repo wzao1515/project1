@@ -73,22 +73,14 @@
 					<h4>Sold at:</h4>
 						<table style="width:40%">
 						<tr>
-						<th>Market</th>
 						<th>Price ($)</th>
-						<th>Website</th>
-						<th>Location</th>
-						<th>Open Time (AM)</th>
-						<th>Close Time (PM)</th>	
+						<th>Market: Name||Website | Location Open(AM) Close(PM))</th>	
 						</tr>
-						{% for m_name, pbid, price, location, topen, tclose, website in prices %}
+						{% for pbid, price, market in prices %}
 						    {% if bid == pbid %}
 						    <tr>
-						    <td>{{m_name}}</td>
 						    <td>{{price}}</td>
-						    <td>{{website}}</td>
-						    <td>{{location}}</td>
-						    <td>{{topen}}</td> 
-						    <td>{{tclose}}</td>
+						    <td>{{market}}</td>
 						    </tr>
 						    {% endif %}
 						  {% endfor %}
