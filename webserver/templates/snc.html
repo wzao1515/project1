@@ -77,7 +77,8 @@
 						<th>Price ($)</th>
 						<th>Website</th>
 						<th>Location</th>
-						<th>Open Time</th>
+						<th>Open Time (AM)</th>
+						<th>Close Time (PM)</th>	
 						</tr>
 						{% for m_name, pbid, price, location, topen, tclose, website in prices %}
 						    {% if bid == pbid %}
@@ -86,7 +87,8 @@
 						    <td>{{price}}</td>
 						    <td>{{website}}</td>
 						    <td>{{location}}</td>
-						    <td>{{topen}} AM - {{tclose}} PM</td>
+						    <td>{{topen}}</td> 
+						    <td>{{tclose}}</td>
 						    </tr>
 						    {% endif %}
 						  {% endfor %}
