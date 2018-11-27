@@ -163,6 +163,17 @@ def post_comment():
 		res = g.conn.execute("UPDATE comment set bid=%s, p_date=%s, description=%s WHERE uid = %s", request.form['bid'], p_date, request.form['text'], uid)
 	return redirect('/snc')
 
+@app.route('/like', methods = ['POST', 'GET'])
+@login_required
+def like():
+	res = []
+	cursor = g.conn.execute("SELECT * from clike where uid=%s and cid=%s", current_user.uid, request.form['cid'])
+	res = cursor.fetchall()
+	if res == []:
+		res = g.conn.execute("INSERT into clike(uid, cid) values(%s, %s)", current_user.uid, request.form['cid'])
+	else:
+		pass
+	return redirect('/snc')	
 
 @app.route('/U_setting', methods = ['POST', 'GET'])
 @login_required
@@ -266,6 +277,12 @@ WHERE HS.bid=S.bid''')
 	comments = cursor.fetchall()
 	cursor.close()
 
+# Compute likes
+	likes = []
+	cursor = g.conn.execute("SELECT distinct count(*), cid from clike group by cid")
+	likes = cursor.fetchall()
+	cursor.close()
+
 # Query Average grades for every snack
 	grades = []
 
@@ -281,13 +298,12 @@ WHERE HS.bid=S.bid''')
 	cursor.close()
 
 # Query where every snack is sold
-        prices = []
-        #cursor = g.conn.execute("WITH tmp AS (SELECT s.m_name, s.bid, s.price, p.location, p.open_time, p.close_time FROM sell AS s LEFT JOIN physicalmarket AS p ON s.m_name = p.m_name) SELECT tmp.bid, tmp.price, CONCAT(tmp.m_name, ' || ', o.website, '  ', tmp.location, '  ', tmp.open_time, '  ', tmp.close_time)  AS market FROM tmp LEFT JOIN onlinemarket AS o ON tmp.m_name = o.m_name")
-        cursor = g.conn.execute("SELECT * FROM sell")
+	prices = []
+	cursor = g.conn.execute("WITH tmp AS (SELECT s.m_name, s.bid, s.price, p.location, p.open_time, p.close_time FROM sell AS s LEFT JOIN physicalmarket AS p ON s.m_name = p.m_name) SELECT tmp.bid, tmp.price, CONCAT(tmp.m_name, ' || ', o.website, '  ', tmp.location, '  ', tmp.open_time, '  ', tmp.close_time)  AS market FROM tmp LEFT JOIN onlinemarket AS o ON tmp.m_name = o.m_name")
 	prices = cursor.fetchall()
-        cursor.close()
+	cursor.close()
 
-	context = dict(snacks=snacks, comments=comments, grades=grades, user_comments=user_comments, prices=prices)
+	context = dict(snacks=snacks, comments=comments, grades=grades, user_comments=user_comments, prices=prices, likes=likes)
 	return render_template("snc.html", **context)
 
 
@@ -314,7 +330,7 @@ def register():
       login_user(new_user)
       return redirect(url_for('snc'))
     else:
-      error = "existed username."
+      error = "existed username, phone or email."
 
   return render_template('register.html', error=error)
 
@@ -325,7 +341,7 @@ def register_user(user):
   cursor.close()
 
 def is_registered(user):
-  cursor = g.conn.execute("SELECT * FROM suser WHERE u_name=%s", (user.username))
+  cursor = g.conn.execute("SELECT * FROM suser WHERE u_name=%s or email=%s or phone=%s", (user.username), (user.email), (user.phone))
   data = cursor.fetchone()
   cursor.close()
 
@@ -342,7 +358,6 @@ def load_user(u_name):
 
   if data is None:
     return None
-  print (data)
   return User(data[5], data[4], data[1], data[3], data[2], data[0])
 
 def valid_user(user):

@@ -76,8 +76,8 @@
 						<th>Price ($)</th>
 						<th>Market: Name||Website | Location Open(AM) Close(PM))</th>	
 						</tr>
-						{% for market, pbid, price in prices %}
-						    {% if bid == pbid %}
+						{% for sbid, price, market in prices %}
+						    {% if bid == sbid %}
 						    <tr>
 						    <td>{{price}}</td>
 						    <td>{{market}}</td>
@@ -89,12 +89,23 @@
 					<br />
 					
 					<h4>What do customers say:</h4>
-					{% for cbid, user_name, grade, comm, dat in comments %}
+					{% for cbid, user_name, grade, comm, dat, com_id in comments %}
 						{% if bid == cbid %}
+						<div class="card">
 						<p style="font-size:120%;color:blue;">{{user_name}}<p>
 						<p style="font-style:oblique;">{{comm}}</p>
 						<p>Grade: {{grade}}</p>
 						</p>{{dat}}</p>
+						{% for cnt, cid in likes %}
+						{% if cid == com_id %}
+						<p>{{cnt}} people like this comment</p>
+						{% endif %}
+						{% endfor %}
+						<form text-align="left" method="POST" action="/like" class="col s12">
+							<input type="hidden" value="{{com_id}}" name="cid">
+        			<input text-align="left" type="submit" value="like!" class="btn waves-effect waves-light" name="like">
+						</form>
+						</div>
 						{% endif %}
 					{% endfor %}
 				</div>
