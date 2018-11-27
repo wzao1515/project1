@@ -3,7 +3,7 @@
 <link rel="stylesheet" href="/static/style.css" type="text/css">
 {% block body %}
  
-<form action="/login" method="POST">
+<form id="form" action="/login" method="POST">
   <div class="login">
     <div class="login-screen">
       <div class="app-title">
@@ -20,20 +20,29 @@
 					<label class="login-field-icon fui-lock" for="login-pass"></label>
 				</div>
  
-    		<input type="submit" value="Log in" class="btn waves-effect waves-light" onclick="check()">
-				<input type="submit" value="Sign up here" class="btn waves-effect waves-light" onclick="location.href='/register'">
-          <br>
+    		<input type="button" value="Log in" class="btn waves-effect waves-light" onclick="check()">
+				<input type="button" value="Sign up here" class="btn waves-effect waves-light" onclick="location.href='/register'">
       </div>
       <h5 id="err" style="color:red;">{{get_flashed_messages()[0]}}</h5>
     </div>
   </div>
 </form>
 
-<script src="../static/js/login.js">
+<script>
+function hasWhiteSpace(s) {
+  return /\s/g.test(s);
+}
 function check()
 {
-	if (check_valid("login")&&check_valid("pwd")) {
-		
+  var form = document.getElementById("form");
+	var x = document.getElementById("login");
+	var y = document.getElementById("pwd");
+	if (!hasWhiteSpace(x.value) && !hasWhiteSpace(y.value)) {
+  	form.submit();
+	}
+	else {
+		var err = document.getElementById("err");
+		err.innerHTML = "Space is not allowed in name and password!";
 	}
 }
 </script> 

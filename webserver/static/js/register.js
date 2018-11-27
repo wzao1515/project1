@@ -50,7 +50,7 @@ function checkpwd()
 function checkusr()
 {
 	x = document.getElementById("usr");
-	us = document.getElementById("usrerr");
+	us = document.getElementById("uerr");
 	if (hasWhiteSpace(x.value)) {
 		us.innerHTML = "space is not allowed";
 		us.style.color = "red";
@@ -69,7 +69,7 @@ function checkloc()
 function checkallok()
 {
 	var form = document.getElementById("form");
-	us = document.getElementById("usrerr");
+	us = document.getElementById("uerr");
 	loc = document.getElementById("locerr");
 	ph = document.getElementById("pherr");
 	email = document.getElementById("emerr");

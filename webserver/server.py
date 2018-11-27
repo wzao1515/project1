@@ -262,7 +262,7 @@ WHERE HS.bid=S.bid''')
 # Comments for all
 	comments = []
 
-	cursor = g.conn.execute("SELECT S.bid, U.u_name, R.grades, C.description, to_char(C.p_date, 'Month DD, YYYY') FROM snack S, rate R, comment C, suser U WHERE S.bid = R.bid AND R.uid = U.uid AND R.bid = C.bid and U.uid = C.uid ORDER BY C.p_date DESC")
+	cursor = g.conn.execute("SELECT S.bid, U.u_name, R.grades, C.description, to_char(C.p_date, 'Month DD, YYYY'), C.cid FROM snack S, rate R, comment C, suser U WHERE S.bid = R.bid AND R.uid = U.uid AND R.bid = C.bid and U.uid = C.uid ORDER BY C.p_date DESC")
 	comments = cursor.fetchall()
 	cursor.close()
 

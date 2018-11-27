@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 {% block title %} Register {% endblock %}
 {% block body %}
+
+<script src="../static/js/register.js"></script>
 <div class="mdl-modal row z-depth-1">
 
   <h2> Register </h2>
@@ -8,37 +10,41 @@
   <form class="col s12" action="" method="POST" id="register">
     <div class="input-field col s12">
       <label for="username">Username</label>
-      <input type="text" name="username" required>
+      <input id="usr" type="text" name="username" onblur="checkusr()">
+			<p style="text-align:left" id="uerr"></p>
     </div>
 
     <div class="input-field col s12">
       <label for="password">Password</label>
-      <input type="password" name="password" required>
+      <input id="pwd" type="password" name="password" onblur="checkpwd()">
+			<p style="text-align:left" id="pwderr"></p>
     </div>
 
     <div class="input-field col s12">
       <label for="location">Location</label>
-      <input type="text" name="location">
+      <input id="loc" type="text" name="location" onblur="checkloc()">
+			<p style="text-align:left;" id="locerr"></p>
     </div>
 
     <div class="input-field col s12">
       <label for="phone">Phone</label>
-      <input type="text" name="phone" required>
+      <input id="ph" type="text" name="phone" onblur="checkph()">
+			<p style="text-align:left" id="pherr"></p>
     </div>
 
     <div class="input-field col s12">
       <label for="email">Email</label>
-      <input type="email" name="email" required>
+      <input id="email" type="email" name="email" onblur="checkemail()">
+			<p style="text-align:left;" id="emerr"></p>
     </div>
 
-    <button class="btn waves-effect waves-light" type="submit">Sign up Now!</button>
+    <button class="btn waves-effect waves-light" type="button" onclick="checkallok()">Sign up Now!</button>
   </form>
-
+	<p id="err"></p>
   {% if error %}
   <p class="error"><strong>Error:</strong> {{ error }}
   {% endif %}
 
-  </div>
-
-  {% endblock %}
+</div>
+{% endblock %}
 
