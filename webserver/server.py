@@ -282,8 +282,9 @@ WHERE HS.bid=S.bid''')
 
 # Query where every snack is sold
         prices = []
-        cursor = g.conn.execute("WITH tmp AS (SELECT s.m_name, s.bid, s.price, p.location, p.open_time, p.close_time FROM sell AS s LEFT JOIN physicalmarket AS p ON s.m_name = p.m_name) SELECT tmp.bid, tmp.price, CONCAT(tmp.m_name, ' || ', o.website, '  ', tmp.location, '  ', tmp.open_time, '  ', tmp.close_time)  AS market FROM tmp LEFT JOIN onlinemarket AS o ON tmp.m_name = o.m_name")
-        prices = cursor.fetchall()
+        #cursor = g.conn.execute("WITH tmp AS (SELECT s.m_name, s.bid, s.price, p.location, p.open_time, p.close_time FROM sell AS s LEFT JOIN physicalmarket AS p ON s.m_name = p.m_name) SELECT tmp.bid, tmp.price, CONCAT(tmp.m_name, ' || ', o.website, '  ', tmp.location, '  ', tmp.open_time, '  ', tmp.close_time)  AS market FROM tmp LEFT JOIN onlinemarket AS o ON tmp.m_name = o.m_name")
+        cursor = g.conn.execute("SELECT * FROM sell")
+	prices = cursor.fetchall()
         cursor.close()
 
 	context = dict(snacks=snacks, comments=comments, grades=grades, user_comments=user_comments, prices=prices)
