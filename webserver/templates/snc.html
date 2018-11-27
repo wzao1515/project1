@@ -76,7 +76,7 @@
 						<th>Price ($)</th>
 						<th>Market: Name||Website | Location Open(AM) Close(PM))</th>	
 						</tr>
-						{% for pbid, price, market in prices %}
+						{% for market, pbid, price in prices %}
 						    {% if bid == pbid %}
 						    <tr>
 						    <td>{{price}}</td>
