@@ -84,3 +84,12 @@ function checkallok()
 		err.innerHTML = "Some infos are not valid, please fill them in.";
 	}
 }
+
+function ch()
+{
+  var x = document.getElementById("pherr");
+  var form = document.getElementById("form");
+  if (x.style.color == "green"){
+    form.submit();
+  }
+}

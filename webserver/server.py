@@ -169,11 +169,21 @@ def like():
 	res = []
 	cursor = g.conn.execute("SELECT * from clike where uid=%s and cid=%s", current_user.uid, request.form['cid'])
 	res = cursor.fetchall()
+	cursor.close()
 	if res == []:
 		res = g.conn.execute("INSERT into clike(uid, cid) values(%s, %s)", current_user.uid, request.form['cid'])
 	else:
 		pass
 	return redirect('/snc')	
+
+def phone_exist(phone):
+	res = []
+	cursor = g.conn.execute("select * from suser where phone=%s", phone)
+	res = cursor.fetchone()
+	cursor.close()
+	if res != []:
+		return False
+	return True
 
 @app.route('/U_setting', methods = ['POST', 'GET'])
 @login_required
@@ -183,7 +193,6 @@ def U_setting():
 	cursor = g.conn.execute("SELECT uid, u_name, location, email, phone from suser WHERE uid=%s", current_user.uid)
 	us = cursor.fetchall()	
 	cursor.close()
-	logging.warning(us)
 	noteat = []
 	cursor = g.conn.execute("SELECT i_name, uid FROM noteat where uid=%s", current_user.uid)
 	noteat = cursor.fetchall()
@@ -193,25 +202,39 @@ def U_setting():
 		context = dict(us=us, noteat=noteat)
 		return render_template('U_setting.html', **context)
 	if bool(request.form):
-		print "request form::"
-		print request.form
-		print "us::"
-		print us
+		error = None
 		locate = ''
 		phone = ''
-		for i, j in enumerate(us[0]):
-			if i == 2:
-				locate = j
-			if i == 4:
-				phone = j
-		if request.form['locate'] != '':
-			locate = request.form['locate']
-		if request.form['phone'] != '':
-			phone = request.form['phone']
-		cursor = g.conn.execute("UPDATE suser set location=%s, phone=%s where uid=%s", phone, phone, current_user.uid)
+		if request.form['phone'] != '' and request.form['phone'] != current_user.phone:
+			if phone_exist(request.form['phone']):
+				error = "This phone number is registered"
+		else:
+			locate = current_user.location
+			phone = current_user.phone
+			if request.form['locate'] != '':
+				locate = request.form['locate']
+			if request.form['phone'] != '':
+				phone = request.form['phone']
+			cursor = g.conn.execute("UPDATE suser set location=%s, phone=%s where uid=%s", locate, phone, current_user.uid)
+		if request.form['NE'] != '':
+			ne = []
+			cursor = g.conn.execute("select * from noteat where uid=%s", current_user.uid)
+			ne = cursor.fetchall()
+			cursor.close()
+			if ne == []:
+				i_name = []
+				cursor = g.conn.execute("select * from ingredient where i_name=%s", request.form['NE'])
+				i_name = cursor.fetchall()
+				cursor.close()
+				if i_name == []:
+					cursor = g.conn.execute("insert into ingredient(i_name) values (%s)", request.form['NE'])
+				cursor = g.conn.execute("insert into noteat(uid, i_name) values (%s, %s)", current_user.uid, request.form['NE'])
+			else:
+				cursor = g.conn.execute("update noteat set i_name=%s where uid=%s", request.form['NE'], current_user.uid)
+			cursor.close()
 	else:	
 		pass
-	context = dict(us=us, noteat=noteat)
+	context = dict(us=us, noteat=noteat, error=error)
 	return render_template('U_setting.html', **context)
 
 @app.route('/snc', methods = ['GET', 'POST'])

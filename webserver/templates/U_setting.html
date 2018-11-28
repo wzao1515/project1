@@ -4,16 +4,16 @@
 	<h2 align="left"> Settings </h2>
 
 {% for uid, name, locate, email, phone in us %}
-	<h4>{{name}}</h4>
-	<h5>{{email}}</h5>
-<form action="" class="col s12" method="post">
+	<h4>Name:{{name}}</h4>
+	<h5>Email:{{email}}</h5>
+<form action="" class="col s12" method="post" id="form">
 	<table class="">
 			<tr>
 				<td>Location</td>
 				<td>
 					<div class="input-field col s12">
       			<input type="text" value="{{request.form.locate}}" name="locate" id="locate">
-        		<label for="username">{{locate}}</label>
+        		<label for="locate">{{locate}}</label>
       		</div>
 				</td>
 			</tr>
@@ -21,13 +21,30 @@
 				<td>Phone</td>
 				<td>
           <div class="input-field col s12">
-            <input type="text" value="{{request.form.phone}}" name="phone" id="phone">
+            <input type="text" value="{{request.form.phone}}" name="phone" onblur="checkph()" id="ph">
             <label for="phone">{{phone}}</label>
+						<p id="pherr" style="text-align:left;color:green"></p>
           </div>
 				</td>
 			</tr>
 	</table>
-	<input class="btn waves-effect waves-light" type="submit" value="Save changes">
-</form>
+			<!-- noteat-->
+			<h5>Tell us what you don't wanna see</h5>
+				{% for i_na, suid in noteat %}
+					{% if suid == uid %}
+					<p style="text-align:left">Now:{{i_na}}</p>
+					{% endif %}
+				{% endfor %}
+				<div class="input-field col s12">
+					<input type="text" value="" name="NE">
+				</div>
+	<input class="btn waves-effect waves-light" type="button" value="Save changes" onclick="ch()">
+	</form>
+	{% if error %}
+	<p class="error"><strong>Error:</strong>{{error}}</p>
+	{% endif %}
+
+<script src="../static/js/register.js">
+</script>
 {% endfor %}
 {% endblock %}
