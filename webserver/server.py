@@ -221,13 +221,14 @@ def U_setting():
 			cursor = g.conn.execute("select * from noteat where uid=%s", current_user.uid)
 			ne = cursor.fetchall()
 			cursor.close()
-			if ne == []:
-				i_name = []
-				cursor = g.conn.execute("select * from ingredient where i_name=%s", request.form['NE'])
-				i_name = cursor.fetchall()
+			i_name = []
+			cursor = g.conn.execute("select * from ingredient where i_name=%s", request.form['NE'])
+			i_name = cursor.fetchall()
+			cursor.close()
+			if i_name == []:
+				cursor = g.conn.execute("insert into ingredient(i_name) values (%s)", request.form['NE'])
 				cursor.close()
-				if i_name == []:
-					cursor = g.conn.execute("insert into ingredient(i_name) values (%s)", request.form['NE'])
+			if ne == []:
 				cursor = g.conn.execute("insert into noteat(uid, i_name) values (%s, %s)", current_user.uid, request.form['NE'])
 			else:
 				cursor = g.conn.execute("update noteat set i_name=%s where uid=%s", request.form['NE'], current_user.uid)
