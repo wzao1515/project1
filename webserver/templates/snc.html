@@ -46,6 +46,14 @@
 				<div class="modal-content">
 					<h3>{{s_name}}</h3>
 						<p>{{type}}</p>
+						{% for conbid, iname in contain %}
+							{%if bid == conbid%}
+                                                		<p style="font-size:300%;color:red;">Caution! {{iname}} contained!<p>
+							{% endif %}
+						{% endfor %}
+
+					<br />
+					<br />
 						<h4>Nutritions:</h4>
 						<table style="width:40%">
   						<tr>
@@ -57,21 +65,21 @@
     						<td>{{cal}}</td>
   						</tr>
   						<tr>
-    						<td>Fat</td>
+    						<td>Fat (g)</td>
     						<td>{{fat}}</td>
   						</tr>
   						<tr>
-    						<td>Carbon</td>
+    						<td>Carbon (g)</td>
     						<td>{{carb}}</td>
   						</tr>
 							<tr>
-								<td>Protein</td>
+								<td>Protein (g)</td>
 								<td>{{prot}}</td>
 						</table>
 					<br />
 					<br />
 					<h4>Sold at:</h4>
-						<table style="width:40%">
+						<table style="width:100%">
 						<tr>
 						<th>Price ($)</th>
 						<th>Market: Name||Website | Location Open(AM) Close(PM))</th>	
